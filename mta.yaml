@@ -1,0 +1,61 @@
+ID: o
+_schema-version: '2.1'
+parameters:
+   deploy_mode: html5-repo
+version: 0.0.1
+
+modules:
+ - name: o-approuter
+   type: approuter.nodejs
+   path: o-approuter
+   parameters:
+      disk-quota: 256M
+      memory: 256M
+   requires:
+    - name: o_html5_repo_runtime
+
+
+ - name: o_ui_deployer
+   type: com.sap.html5.application-content
+   path: o_ui_deployer
+   requires:
+    - name: o_html5_repo_host
+
+
+ - name: db
+   type: hdb
+   path: db
+   requires:
+    - name: hdi_db
+
+
+ - name: SRV
+   type: nodejs
+   path: SRV
+   provides:
+    - name: SRV_api
+      properties:
+         url: ${default-url}
+
+resources:
+ - name: o_html5_repo_runtime
+   parameters:
+      service-plan: app-runtime
+      service: html5-apps-repo
+   type: org.cloudfoundry.managed-service
+
+ - name: o_html5_repo_host
+   parameters:
+      service-plan: app-host
+      service: html5-apps-repo
+   type: org.cloudfoundry.managed-service
+
+
+ - name: hdi_db
+   parameters:
+      config:
+         schema: NE
+   properties:
+      hdi-container-name: ${service-name}
+   type: com.sap.xs.hdi-container
+
